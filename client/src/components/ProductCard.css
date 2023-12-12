@@ -1,0 +1,16 @@
+.product-card{
+    margin:1rem;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+}
+
+.product-card:hover{
+    transform: scale(1.05);
+    
+    transition-timing-function: ease-in-out;
+    transition: ease-in-out transform 0.5s;
+}
+.product-img{
+    margin-top: 10px;
+
+}
