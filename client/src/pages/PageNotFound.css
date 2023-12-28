@@ -1,0 +1,16 @@
+.error{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 5rem;
+    margin-top: 1rem;
+}
+
+.error h1{
+    margin: 5rem 5rem 3rem;
+}
+
+h4{
+    margin: 1rem;
+}

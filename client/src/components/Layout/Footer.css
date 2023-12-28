@@ -1,0 +1,45 @@
+footer {
+    position: relative;
+    left: 0;
+    bottom: 0;
+    width:100%
+  }
+
+
+.f-info{
+    text-align: center;
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #000000 !important;
+    color: #ffffff;
+    align-items: space-evenly;
+}
+
+.f-info-links, .f-info-socials, .f-info-brand{
+    padding-top: 1rem;
+    padding-bottom: 0.5 rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.f-info-socials i{
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+.f-info-socials i:hover{
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #e40202
+}
+
+.f-info-links a{
+    text-decoration: none;
+    color: #ffffff;
+    padding-bottom: 1rem;
+}
+.f-info-links a:hover{
+    color: #e40202;
+}

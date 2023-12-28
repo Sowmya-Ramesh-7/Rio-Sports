@@ -1,0 +1,16 @@
+
+.title{
+    font-family: 'Caveat', cursive;
+    font-size: x-large;
+    color: #b00000;
+    border-bottom: 2px rgb(111, 28, 28) dashed;
+}
+.header{
+    display: flex;
+    justify-content: space-between;
+}
+.header form{
+    justify-self:flex-end !important;
+    align-self: center;
+}
+

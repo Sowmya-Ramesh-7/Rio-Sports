@@ -1,4 +1,4 @@
-.product-card{
+/* .product-card{
     margin:1rem;
     margin-bottom: 2rem;
     border-radius: 10px;
@@ -12,5 +12,31 @@
 }
 .product-img{
     margin-top: 10px;
+} */
 
+/* Index page -cards */
+.product-card{
+    /* border: none !important; */
+    
+    margin: 1.5rem;
+    /* margin-right: 1rem; */
+    border-radius: 1rem !important
+} 
+
+.card-img-top{
+    border-radius: 1rem !important;
+    width: 100% !important;
+    object-fit: cover !important; 
+} 
+
+.card-body{
+    padding:0.25 rem !important;
+}
+
+
+.product-link{
+    text-decoration: none;
+}
+.product-link:hover{
+    transform: scale(1.1);
 }

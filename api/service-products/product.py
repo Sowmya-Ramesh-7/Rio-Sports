@@ -86,7 +86,7 @@ class BaseException(Exception):
         return str({'status':self.status,'message':self.message})
     
 
-class ProductnotfoundError(BaseException):
+class ProductNotFoundError(BaseException):
     def __init__(self) ->None:
         super().__init__(404,"Invalid product or product not found")
 
@@ -119,17 +119,40 @@ def show_products():
     ]
     return jsonify(products_list), 200
 
+@app.route("/api/products/?category=<category>", methods=["GET"])
+def show_by_category(category):
+    products = session.query(Products).filter_by(category=category).all()
+    if not products:
+        err = ProductNotFoundError()
+        return str(err), err.status
+    else:
+        products_list = [
+        {
+            "name": product.name,
+            "id": product.id,
+            "description": product.description,
+            "image": product.image,
+            "price": product.price,
+            "category": product.category,
+            "discount": product.discount,
+            "gender": product.gender
+        }
+        for product in products
+    ]
+    return jsonify(products_list), 200
+
+
 @app.route("/api/products/<string:id>", methods=["DELETE"])
 def delete_product(id):
     product = session.query(Products).filter_by(id=id).first()
     if not product:
-        err = ProductnotfoundError()
+        err = ProductNotFoundError()
         return str(err), err.status
     else:
         session.delete(product)
         session.commit()
         return make_response("", 200)
-from flask import jsonify
+
 
 @app.route("/api/products/<id>", methods=["GET"])
 def show_detail(id):
@@ -158,7 +181,7 @@ def edit_products(id):
     product = session.query(Products).filter_by(id=id).first()
 
     if not product:
-        err = ProductnotfoundError()
+        err = ProductNotFoundError()
         return str(err), err.status
 
     for key, value in updated_product_data.items():
