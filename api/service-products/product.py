@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,session
 from flask import request,make_response
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -6,49 +6,55 @@ import sqlalchemy as db
 from sqlalchemy import Column,Integer,String
 from flask import jsonify
 from flask_cors import CORS
+from flask_pymongo import PyMongo
 import uuid
 
 app = Flask(__name__)
 CORS(app,origins='http://localhost:5173')
 
+# app.config['Mongo_URI'] ='mongodb://localhost:27017/products'
+# mongo =PyMongo(app)
 
-engine=db.create_engine("sqlite:///products.sqlite")
-
-conn=engine.connect()
-
-metadata=db.MetaData()
-
-products=db.Table('products',metadata,
-                    db.Column('id',db.String(),primary_key=True),
-                    db.Column('name',db.String(),nullable=False),
-                    db.Column('description',db.String()),
-                    db.Column('image',db.String()),
-                    db.Column('price',db.Integer()),
-                    db.Column('category',db.String()),
-                    db.Column('discount',db.Integer()),
-                    db.Column('gender',db.String()),
-                    )
-
-metadata.create_all(engine)
-
-Base=declarative_base()
-session=sessionmaker(bind=engine)()
+mongo = PyMongo(app, uri='mongodb://localhost:27017/products')
 
 
+# engine=db.create_engine("sqlite:///products.sqlite")
 
-class Products(Base):
-    __tablename__="products"
+# conn=engine.connect()
+
+# metadata=db.MetaData()
+
+# products=db.Table('products',metadata,
+#                     db.Column('id',db.String(),primary_key=True),
+#                     db.Column('name',db.String(),nullable=False),
+#                     db.Column('description',db.String()),
+#                     db.Column('image',db.String()),
+#                     db.Column('price',db.Integer()),
+#                     db.Column('category',db.String()),
+#                     db.Column('discount',db.Integer()),
+#                     db.Column('gender',db.String()),
+#                     )
+
+# metadata.create_all(engine)
+
+# Base=declarative_base()
+# session=sessionmaker(bind=engine)()
+
+
+
+
+    # __tablename__="products"
     
-    id=Column(String,primary_key=True)
-    name = Column(String)
-    description=Column(String)
-    image=Column(String)
-    price=Column(Integer)
-    category=Column(String)
-    discount=Column(Integer)
-    gender=Column(String)
+    # id=Column(String,primary_key=True)
+    # name = Column(String)
+    # description=Column(String)
+    # image=Column(String)
+    # price=Column(Integer)
+    # category=Column(String)
+    # discount=Column(Integer)
+    # gender=Column(String)
     
-
+class Products():
     def __init__(self,id,name,description,image,price,category,discount,gender):
         super().__init__()
         self.id=id
