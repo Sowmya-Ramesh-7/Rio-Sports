@@ -8,7 +8,7 @@ export default function Header(){
             <div className="container-fluid header">
                 <div>
                     <img className="navbar-brand logo" src={logo} alt="Rio Sports" style={{height:5+'rem'}}/>
-                    <span className="navbar-brand title">Rio Sports</span>
+                    <span className="navbar-brand title">Rio Fashion</span>
                 </div>
                 <form className="d-flex" method="get">
                     <input className="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search"/>

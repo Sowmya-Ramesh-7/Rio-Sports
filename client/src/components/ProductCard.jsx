@@ -1,9 +1,12 @@
-import colarTshirt from "./../assets/Images/colarTshirt.jpg"
+// import colarTshirt from "./../assets/Images/colarTshirt.jpg"
+import ViewBtn from "./ViewBtn";
+import CartBtns from "./CartBtns";
 import "./ProductCard.css"
-import {Link} from 'react-router-dom'
-function ProductCard({ product }){
+
+function ProductCard({ product, btn }){
     const discountedPrice=product.price*(100-product.discount)/100;
     console.dir(product)
+    let path="/products/"+product._id;
     console.dir(discountedPrice)
     return (
         <div className="card product-card col-xxs-1 col-xxl-6 "  style={{width: 18 +'rem'}}>
@@ -16,7 +19,11 @@ function ProductCard({ product }){
                         <br/><i>Discount: {product.discount}% off</i><br/>
                     </small>
                 </p>
-                <Link to="/products/product.id" className="button btn btn-dark product-link">View Details</Link> 
+                {btn.content==='View Details'?
+                    <ViewBtn path={path} content="View Details" />
+                    :btn.content==='cart'?<CartBtns/>:""
+                }
+                
             </div>
         </div>
     )

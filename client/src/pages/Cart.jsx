@@ -17,10 +17,12 @@ export default function Products(){
     }
     console.log(products)
     return (
+        
+
         <div className="prod-container row row-cols-lg-4 row-cols-xs-2 row-cols-sm-3 mb-3 ms-sm-3 ms-xs-1 me-1">
             {products.map((product)=>{
                 return(
-                    <ProductCard key= {product.id} product={{...product}} btn={{content:"View Details"}}/>
+                    <ProductCard key= {product.id} product={{...product}} btn={{content:"cart"}}/>
                 );
             })}
         </div>

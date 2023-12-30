@@ -17,15 +17,12 @@ const ProductProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
   
     useEffect(() => {
-      const getProducts = async ( category) => {
+      const getProducts = async () => {
         dispatch({ type: "SET_LOADING" });
         try {
-          if(!category){
-            
-          }
           const response = await axios.get('http://localhost:5000/api/products');
           const allProducts = await response.data;
-          console.log("all products"+allProducts);
+          console.log(allProducts);
           dispatch({ type: "SET_API_DATA", payload: allProducts });
         } catch (error) {
           dispatch({ type: "API_ERROR",payload:error });

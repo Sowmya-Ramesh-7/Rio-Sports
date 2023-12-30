@@ -33,10 +33,3 @@
     padding:0.25 rem !important;
 }
 
-
-.product-link{
-    text-decoration: none;
-}
-.product-link:hover{
-    transform: scale(1.1);
-}

@@ -13,3 +13,9 @@ body{
 .content{
     flex:1;
 }
+#page-title{
+    text-align: center;
+    border-bottom: 0;
+    margin: auto;
+    text-decoration: none;
+}

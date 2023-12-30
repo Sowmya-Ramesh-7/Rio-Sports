@@ -1,63 +1,27 @@
-from flask import Flask,session
+from flask import Flask
 from flask import request,make_response
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
-import sqlalchemy as db 
-from sqlalchemy import Column,Integer,String
 from flask import jsonify
+from bson.objectid import ObjectId
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-import uuid
+from pymongo import MongoClient
+
 
 app = Flask(__name__)
 CORS(app,origins='http://localhost:5173')
 
 # app.config['Mongo_URI'] ='mongodb://localhost:27017/products'
 # mongo =PyMongo(app)
+client = MongoClient("mongodb://localhost:27017/")
+db = client["RioFashion"]
 
-mongo = PyMongo(app, uri='mongodb://localhost:27017/products')
-
-
-# engine=db.create_engine("sqlite:///products.sqlite")
-
-# conn=engine.connect()
-
-# metadata=db.MetaData()
-
-# products=db.Table('products',metadata,
-#                     db.Column('id',db.String(),primary_key=True),
-#                     db.Column('name',db.String(),nullable=False),
-#                     db.Column('description',db.String()),
-#                     db.Column('image',db.String()),
-#                     db.Column('price',db.Integer()),
-#                     db.Column('category',db.String()),
-#                     db.Column('discount',db.Integer()),
-#                     db.Column('gender',db.String()),
-#                     )
-
-# metadata.create_all(engine)
-
-# Base=declarative_base()
-# session=sessionmaker(bind=engine)()
+# mongo = PyMongo(app, uri='mongodb://localhost:27017/products')
 
 
 
-
-    # __tablename__="products"
-    
-    # id=Column(String,primary_key=True)
-    # name = Column(String)
-    # description=Column(String)
-    # image=Column(String)
-    # price=Column(Integer)
-    # category=Column(String)
-    # discount=Column(Integer)
-    # gender=Column(String)
-    
 class Products():
-    def __init__(self,id,name,description,image,price,category,discount,gender):
+    def __init__(self,name,description,image,price,category,discount,gender):
         super().__init__()
-        self.id=id
         self.name=name
         self.description=description
         self.image=image
@@ -66,9 +30,9 @@ class Products():
         self.discount=discount
         self.gender=gender
 
-    def __str__(self):
-        return str({
-            "id":self.id,
+    def to_dict(self):
+        return {
+            "_id": str(getattr(self, '_id', None)),
             "name":self.name,
             "description":self.description,
             "image":self.image,
@@ -76,8 +40,34 @@ class Products():
             "category":self.category,
             "discount":self.discount,
             "gender":self.gender
-        })
+        }
+        
+class ProductDAO:
+    def __init__(self, db):
+        self.collection = db.products
+
+    def create_product(self, product):
+        result = self.collection.insert_one(product.to_dict())
+        return str(result.inserted_id)
+
+    def get_product(self, product_id):
+        return self.collection.find_one({"_id": ObjectId(product_id)})
+
+    def update_product(self, product_id, new_data):
+        result = self.collection.update_one({"_id": ObjectId(product_id)}, {"$set": new_data})
+        return result.modified_count > 0
+
+    def delete_product(self, product_id):
+        result = self.collection.delete_one({"_id": ObjectId(product_id)})
+        return result.deleted_count > 0
     
+    def get_all_products(self):
+        return list(self.collection.find({}))
+    
+    def get_products_by_category(self, category):
+        return list(self.collection.find({"category": category}))
+    
+product_dao = ProductDAO(db)
     
 class BaseException(Exception):
     status=400
@@ -94,106 +84,66 @@ class BaseException(Exception):
 
 class ProductNotFoundError(BaseException):
     def __init__(self) ->None:
-        super().__init__(404,"Invalid product or product not found")
+        super().__init__(404,"Invalid product or Products not found")
 
 
 @app.route("/api/products",methods=["POST"])
 def create_product():
     newproduct=request.form
-    productobj=Products(str(uuid.uuid4()),newproduct['name'],newproduct['description'],"empty",newproduct['price'],newproduct['category'],newproduct['discount'],newproduct['gender'])
-    session.add(productobj)
-    session.commit()
+    new_product=Products(newproduct['name'],newproduct['description'],"empty",newproduct['price'],newproduct['category'],newproduct['discount'],newproduct['gender'])
+    product_dao.create_product(new_product)
     return make_response(""),200
 
     
 
 @app.route("/api/products", methods=["GET"])
 def show_products():
-    all_products = session.query(Products).all()
-    products_list = [
-        {
-            "name": product.name,
-            "id": product.id,
-            "description": product.description,
-            "image": product.image,
-            "price": product.price,
-            "category": product.category,
-            "discount": product.discount,
-            "gender": product.gender
-        }
-        for product in all_products
-    ]
+    all_products = product_dao.get_all_products()
+    if not all_products:
+        err = ProductNotFoundError()
+        return str(err), err.status
+    print(all_products)
+    products_list = [{**product,'_id':str(product['_id'])} for product in all_products]
     return jsonify(products_list), 200
 
 @app.route("/api/products/?category=<category>", methods=["GET"])
 def show_by_category(category):
-    products = session.query(Products).filter_by(category=category).all()
+    products = product_dao.get_products_by_category(category)
     if not products:
         err = ProductNotFoundError()
         return str(err), err.status
     else:
-        products_list = [
-        {
-            "name": product.name,
-            "id": product.id,
-            "description": product.description,
-            "image": product.image,
-            "price": product.price,
-            "category": product.category,
-            "discount": product.discount,
-            "gender": product.gender
-        }
-        for product in products
-    ]
-    return jsonify(products_list), 200
+        return jsonify(products), 200
 
 
 @app.route("/api/products/<string:id>", methods=["DELETE"])
 def delete_product(id):
-    product = session.query(Products).filter_by(id=id).first()
-    if not product:
+    if not product_dao.delete_product(id):
         err = ProductNotFoundError()
         return str(err), err.status
     else:
-        session.delete(product)
-        session.commit()
         return make_response("", 200)
 
 
 @app.route("/api/products/<id>", methods=["GET"])
 def show_detail(id):
-    product = session.query(Products).filter_by(id=id).first()
+    product = product_dao.get_product(id)
     if not product:
         err = ProductNotFoundError()
         return str(err), err.status
-    else:
-        # Convert the product object to a dictionary
-        product_dict = {
-            "name": product.name,
-            "id": product.id,
-            "description": product.description,
-            "image": product.image,
-            "price": product.price,
-            "category": product.category,
-            "discount": product.discount,
-            "gender": product.gender
-        }
-        return jsonify(product_dict), 200
+    else: 
+        return jsonify({**product,'_id':str(product['_id'])}), 200
     
 
 @app.route("/api/products/<id>", methods=["PATCH"])
 def edit_products(id):
-    updated_product_data = request.json
-    product = session.query(Products).filter_by(id=id).first()
+    updated_product = request.json
+    modified = product_dao.update_product(id, updated_product)
 
-    if not product:
+    if not modified:
         err = ProductNotFoundError()
         return str(err), err.status
-
-    for key, value in updated_product_data.items():
-        setattr(product, key, value)
-
-    session.commit() 
+    
     return make_response("", 200)
     
 app.run(debug=True)  

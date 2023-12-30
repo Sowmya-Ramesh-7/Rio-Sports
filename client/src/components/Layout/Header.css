@@ -14,3 +14,11 @@
     align-self: center;
 }
 
+@media (max-width:560px) {
+    .header{
+        flex-direction: column;
+    }
+    .header form{
+        margin:1rem;
+    }
+}

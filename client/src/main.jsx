@@ -7,16 +7,26 @@ import Products from './pages/Products.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
 import CreateProductForm from './pages/CreateProductForm.jsx'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import Login from './pages/Login.jsx'
+import Signup from './pages/Signup.jsx'
+import ProductDetails from './pages/ProductDetails.jsx'
 import axios from 'axios'
+
 
 const router=createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="" element={<Home />}/>
+      <Route path="login" element={<Login />}/>
+      <Route path="signup" element={<Signup />}/>
       <Route path="products" >
         <Route 
         path="" 
         element={<Products/>}
+        />
+        <Route 
+        path=":id" 
+        element={<ProductDetails/>}
         />
         <Route 
         path="?category=:categoryName"

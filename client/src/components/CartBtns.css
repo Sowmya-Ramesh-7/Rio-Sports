@@ -1,0 +1,14 @@
+.cartBtns{
+    display: flex;
+    margin: 1rem;
+}
+.quantity{
+    display: flex;
+    width: 60%;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="number"] {
+    text-align: center;
+}
