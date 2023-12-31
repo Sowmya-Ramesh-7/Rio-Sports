@@ -5,17 +5,23 @@ from bson.objectid import ObjectId
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
+import os
+import uuid
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app,origins='http://localhost:5173')
 
-# app.config['Mongo_URI'] ='mongodb://localhost:27017/products'
-# mongo =PyMongo(app)
+
 client = MongoClient("mongodb://localhost:27017/")
 db = client["RioFashion"]
 
-# mongo = PyMongo(app, uri='mongodb://localhost:27017/products')
+
 
 
 
@@ -32,7 +38,6 @@ class Products():
 
     def to_dict(self):
         return {
-            "_id": str(getattr(self, '_id', None)),
             "name":self.name,
             "description":self.description,
             "image":self.image,
@@ -90,7 +95,17 @@ class ProductNotFoundError(BaseException):
 @app.route("/api/products",methods=["POST"])
 def create_product():
     newproduct=request.form
-    new_product=Products(newproduct['name'],newproduct['description'],"empty",newproduct['price'],newproduct['category'],newproduct['discount'],newproduct['gender'])
+    
+    #storing file in local storage
+    file = request.files['image']
+    
+    #storing image to cloudinary
+    cloudinary.config(cloud_name = os.getenv('CLOUD_NAME'), api_key=os.getenv('API_KEY'), 
+    api_secret=os.getenv('API_SECRET'))
+    
+    upload_result = cloudinary.uploader.upload(file, public_id=f"rio_Fashion_DEV/image_{str(uuid.uuid4())}")
+    print(upload_result['url'])
+    new_product=Products(newproduct['name'],newproduct['description'],upload_result['url'],newproduct['price'],newproduct['category'],newproduct['discount'],newproduct['gender'])
     product_dao.create_product(new_product)
     return make_response(""),200
 
