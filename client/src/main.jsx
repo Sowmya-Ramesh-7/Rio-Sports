@@ -6,12 +6,23 @@ import Home from './pages/Home.jsx'
 import Products from './pages/Products.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
 import CreateProductForm from './pages/CreateProductForm.jsx'
-import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import EditProductForm from './pages/EditProductForm.jsx'
+import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements, useNavigate } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
-import axios from 'axios'
 
+
+
+const ProductDetailsWrapper = () => {
+
+  const navigate = useNavigate();
+  const handlePut = (id) => {
+    navigate(`/products/${id}/edit`);
+  };
+
+  return <ProductDetails onPut={handlePut} />;
+};
 
 const router=createBrowserRouter(
   createRoutesFromElements(
@@ -24,9 +35,13 @@ const router=createBrowserRouter(
         path="" 
         element={<Products/>}
         />
-        <Route 
-        path=":id" 
+        <Route
+        path=":id"
         element={<ProductDetails/>}
+        />
+        <Route
+        path=":id/edit"
+        element={<EditProductForm/>}
         />
         <Route 
         path="?category=:categoryName"
@@ -45,6 +60,7 @@ const router=createBrowserRouter(
 )
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+  
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>,

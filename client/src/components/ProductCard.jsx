@@ -10,7 +10,7 @@ function ProductCard({ product, btn }){
     console.dir(discountedPrice)
     return (
         <div className="card product-card col-xxs-1 col-xxl-6 "  style={{width: 18 +'rem'}}>
-            <img src="{ product.image.url}" className="card-img-top" alt="Product Images" style={{height: 18 +'rem'}}/>
+            <img src={product.image} className="card-img-top" alt="Product Images" style={{height: 18 +'rem'}}/>
             <div className="card-body">
                 <p className="card-text">
                     <b>{ product.name }</b><br/>

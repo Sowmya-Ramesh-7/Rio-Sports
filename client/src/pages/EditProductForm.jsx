@@ -1,9 +1,11 @@
-import {Form, useNavigate} from 'react-router-dom'
-import { useState } from 'react';
+import {Form, useNavigate, useParams} from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import Loading from '../components/Loading';
 
-export default function EditProductForm(){
+export default function CreateProductForm(){
+    let { id } = useParams();
     const navigate = useNavigate();
-
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -13,6 +15,32 @@ export default function EditProductForm(){
         gender: '', 
         discount: 0,
       });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const getSingleProduct = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+            const productData = response.data;
+            productData['previousImage']=productData['image']
+            console.log(productData);
+            setFormData(productData);
+        } catch (error) {
+            console.error('Error fetching product:', error);
+            setError('Error fetching product. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+        };
+        getSingleProduct();
+    }, [id]);
+
+    if (loading) {
+        return <Loading/>;
+    }
+
+    
 
     const handleChange = (event) => {
         const { name, value, type, files } = event.target;
@@ -22,7 +50,7 @@ export default function EditProductForm(){
         }));
       };
 
-  
+
     const handleSubmit = async(event) => {
         event.preventDefault();
 
@@ -31,21 +59,20 @@ export default function EditProductForm(){
             formDataObject.append(key, formData[key]);
         }
 
-        console.log(formData);
-        const response = await axios.post('/api/products', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      if (response.status === 200) {
-        console.log('Form submitted successfully');
+        const response = await axios.put(`http://127.0.0.1:5000/api/products/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }, 
+        });
+        if (response.status === 200) {
+            console.log('Form submitted successfully');
 
-        console.log(response.data);
-      } else {
-        console.error('Form submission failed');
-      }
-  };
+            console.log(response.data);
+            navigate("/products");
+        } else {
+            console.error('Form submission failed');
+        }
+    };
   
   
     return (
@@ -53,6 +80,9 @@ export default function EditProductForm(){
         <Form encType="multipart/form-data" onSubmit={handleSubmit}>
             <div className="row">
                 <div className="col-8 offset-2">
+                    <div className="title mb-4 mt-4"  id="page-title">
+                        <h1>Edit Product</h1>
+                    </div>
                     <div className="mb-4 mt-4">
                         <label htmlFor="name"  className="form-label">Product Name</label>
                         <input type="text" id="name" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} className="form-control" required />
@@ -64,30 +94,35 @@ export default function EditProductForm(){
                     </div>
 
                     <div className="mb-4">
+                        <p>Previous Image Preview</p>
+                        <img src={formData.previousImage} className="card" alt="Original Image" />
+                    </div>
+
+                    <div className="mb-4">
                         <label htmlFor="image" className="form-label">Upload an Image</label><br/> 
-                        <input type="file" id="image" name="image" accept="image/jpeg, image/jpg, image/png" onChange={handleChange}  required className="form-control-file"/>  
+                        <input type="file" id="image" name="image" accept="image/jpeg, image/jpg, image/png" onChange={handleChange} className="form-control-file"/>  
                     </div>
                     
                     <div className="mb-4">
                         <label htmlFor="category" className="form-label">Category</label>
                         <select id="category" name="category" className="form-select"  onChange={handleChange}  required >
                             <option value="">-- Select the Category --</option>
-                            <option value="Casual">Casual</option>
-                            <option value="Party Wear">Party Wear</option>
-                            <option value="Formal">Formal</option>
-                            <option value="Ethnic">Ethnic</option>
-                            <option value="Western">Western</option>
+                            <option value="Casual" selected={formData.category === "Casual"}>Casual</option>
+                            <option value="Party Wear" selected={formData.category === "Party Wear"}>Party Wear</option>
+                            <option value="Formal" selected={formData.category === "Formal"}>Formal</option>
+                            <option value="Ethnic" selected={formData.category === "Ethnic"}>Ethnic</option>
+                            <option value="Western" selected={formData.category === "Western"}>Western</option>
                         </select>
                     </div> 
 
                     <div className="mb-4">
-                        <label htmlFor="category" className="form-label">Gender</label>
-                        <select id="category" name="category" className="form-select"  onChange={handleChange} required >
+                        <label htmlFor="gender" className="form-label">Gender</label>
+                        <select id="gender" name="gender" className="form-select" onChange={handleChange} required >
                             <option value="">-- Select the Category --</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Kids">Kids</option>
-                            <option value="Unisex">Unisex</option>
+                            <option value="Male" selected={formData.gender === "Male"}>Male</option>
+                            <option value="Female" selected={formData.gender === "Female"}>Female</option>
+                            <option value="Kids" selected={formData.gender === "Kids"}>Kids</option>
+                            <option value="Unisex" selected={formData.gender === "Unisex"}>Unisex</option>
                         </select>
                     </div> 
                     
@@ -102,13 +137,13 @@ export default function EditProductForm(){
                         </div>
                         <div className="mb-4 col-5 offset-1">
                             <fieldset className="border p-3 m-2 "> 
-                                <output>Discount = {formData.discount +" %"} &emsp; Selling Price= {formData.price*(100-formData.discount)/100}</output>
+                                <output>Discount = {formData.discount +" %"} &emsp; Selling Price= {Number(formData.price*(100-formData.discount)/100).toFixed(2)}</output>
                             </fieldset>
                         </div>
                     </div>
 
                     <div className="mb-5">
-                        <button className="btn btn-dark">ADD</button>
+                        <button className="btn btn-danger">EDIT</button>
                     </div>
 
                 </div>
@@ -116,5 +151,3 @@ export default function EditProductForm(){
         </Form>
     );
 }
-
-

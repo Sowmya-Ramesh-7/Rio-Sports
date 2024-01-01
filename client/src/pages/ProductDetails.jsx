@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../components/Loading';
+import { Form } from 'react-router-dom';
 
 import './ProductDetails.css'
 
@@ -57,6 +58,10 @@ export default function ProductDetails() {
                       &nbsp;&nbsp;&nbsp;&nbsp;
               </small>
           </p><br/>
+          <Form action={`/products/${id}/edit`}>
+            <button className="btn btn-danger product-link">Edit</button>
+          </Form>
+          
           <button onClick={()=>{}} className="button btn btn-dark product-link">Add to Cart</button>
         </div>
     </div>

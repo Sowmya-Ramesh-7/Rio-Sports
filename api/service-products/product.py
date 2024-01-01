@@ -59,6 +59,7 @@ class ProductDAO:
         return self.collection.find_one({"_id": ObjectId(product_id)})
 
     def update_product(self, product_id, new_data):
+        new_data.pop('_id', None)
         result = self.collection.update_one({"_id": ObjectId(product_id)}, {"$set": new_data})
         return result.modified_count > 0
 
@@ -117,7 +118,6 @@ def show_products():
     if not all_products:
         err = ProductNotFoundError()
         return str(err), err.status
-    print(all_products)
     products_list = [{**product,'_id':str(product['_id'])} for product in all_products]
     return jsonify(products_list), 200
 
@@ -150,18 +150,33 @@ def show_detail(id):
         return jsonify({**product,'_id':str(product['_id'])}), 200
     
 
-@app.route("/api/products/<id>", methods=["PATCH"])
+@app.route("/api/products/<id>", methods=["PUT"])
 def edit_products(id):
-    updated_product = request.json
+
+    updated_product = request.form.to_dict()
+
+    if 'image' in request.files:
+        file = request.files['image']
+
+        cloudinary.config(
+            cloud_name=os.getenv('CLOUD_NAME'),
+            api_key=os.getenv('API_KEY'),
+            api_secret=os.getenv('API_SECRET')
+        )
+        upload_result = cloudinary.uploader.upload(file, public_id=f"rio_Fashion_DEV/image_{str(uuid.uuid4())}")
+        updated_product['image'] = upload_result['url']
+        print(updated_product,"++++",upload_result)
+
     modified = product_dao.update_product(id, updated_product)
 
     if not modified:
         err = ProductNotFoundError()
         return str(err), err.status
-    
+
     return make_response("", 200)
+
     
-app.run(debug=True)  
+app.run(debug=True,port=5000)  
 
    
 

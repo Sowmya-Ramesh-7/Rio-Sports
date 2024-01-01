@@ -34,7 +34,7 @@ export default function CreateProductForm(){
 
         const response = await axios.post('http://127.0.0.1:5000/api/products', formData, {
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'multipart/form-data',
             }, 
         });
         if (response.status === 200) {
@@ -53,6 +53,9 @@ export default function CreateProductForm(){
         <Form encType="multipart/form-data" onSubmit={handleSubmit}>
             <div className="row">
                 <div className="col-8 offset-2">
+                    <div className="title mb-4 mt-4"  id="page-title">
+                        <h1>New Product</h1>
+                    </div>
                     <div className="mb-4 mt-4">
                         <label htmlFor="name"  className="form-label">Product Name</label>
                         <input type="text" id="name" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} className="form-control" required />
@@ -102,7 +105,7 @@ export default function CreateProductForm(){
                         </div>
                         <div className="mb-4 col-5 offset-1">
                             <fieldset className="border p-3 m-2 "> 
-                                <output>Discount = {formData.discount +" %"} &emsp; Selling Price= {formData.price*(100-formData.discount)/100}</output>
+                                <output>Discount = {formData.discount +" %"} &emsp; Selling Price= {Number(formData.price*(100-formData.discount)/100).toFixed(2)}</output>
                             </fieldset>
                         </div>
                     </div>

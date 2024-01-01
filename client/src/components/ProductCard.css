@@ -17,7 +17,8 @@
 /* Index page -cards */
 .product-card{
     /* border: none !important; */
-    
+    padding-right:0 !important; 
+    padding-left: 0 !important; 
     margin: 1.5rem;
     /* margin-right: 1rem; */
     border-radius: 1rem !important
@@ -27,6 +28,7 @@
     border-radius: 1rem !important;
     width: 100% !important;
     object-fit: cover !important; 
+    
 } 
 
 .card-body{
