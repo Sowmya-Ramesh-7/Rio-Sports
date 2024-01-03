@@ -3,9 +3,13 @@ import {useProduct} from "../contexts/ProductContext";
 import { useErrorBoundary } from "react-error-boundary";
 import './Products.css'
 import Loading from "../components/Loading";
+import { useEffect } from "react";
 
 export default function Products(){
-    const {isLoading, isError, products,error}=useProduct();
+    
+    
+    const {isLoading, isError, products,error}= useProduct();
+
     const { showBoundary } = useErrorBoundary();
     if(isLoading){
         return (

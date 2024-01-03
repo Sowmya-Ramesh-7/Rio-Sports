@@ -50,3 +50,8 @@ nav{
     text-decoration: none;
     background-color:#e40202;
 }
+
+.right{
+    display: flex;
+    
+}

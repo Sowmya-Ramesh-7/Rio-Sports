@@ -1,9 +1,11 @@
 import {Form, useNavigate} from 'react-router-dom'
 import { useState } from 'react';
 import axios from 'axios';
+import { useProduct } from '../contexts/ProductContext';
 
 export default function CreateProductForm(){
     const navigate = useNavigate();
+    const {getProducts}= useProduct();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -27,24 +29,29 @@ export default function CreateProductForm(){
     const handleSubmit = async(event) => {
         event.preventDefault();
 
-        const formDataObject = new FormData();
-        for (const key in formData) {
-            formDataObject.append(key, formData[key]);
+        try{
+            const response = await axios.post('http://127.0.0.1:5000/api/products', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }, 
+            });
+            if(response.status === 401){
+                navigate("/login");
+            }
+            if(response.status === 200) {
+                console.log('Form submitted successfully');
+                getProducts();
+                navigate("/products");
+            }else{
+                console.error('Form submission failed');
+            }
         }
-
-        const response = await axios.post('http://127.0.0.1:5000/api/products', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            }, 
-        });
-        if (response.status === 200) {
-            console.log('Form submitted successfully');
-
-            console.log(response.data);
-            navigate("/products");
-        } else {
-            console.error('Form submission failed');
+        catch(e){
+            navigate("/login");
         }
+           
+
+        
     };
   
   

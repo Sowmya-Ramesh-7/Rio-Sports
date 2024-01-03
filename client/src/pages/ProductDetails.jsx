@@ -6,6 +6,8 @@ import { Form } from 'react-router-dom';
 
 import './ProductDetails.css'
 
+
+
 export default function ProductDetails() {
   let { id } = useParams();
   const [productData, setProductData] = useState(null);
@@ -35,10 +37,27 @@ export default function ProductDetails() {
 
     const discountedPrice = productData.price * (100 - productData.discount) / 100;
 
+    const handleSubmit = async(event) => {
+      event.preventDefault();
+
+      const response = await axios.post(`http://127.0.0.1:5001/api/userid/cart/${productData._id}`,{
+          headers: {
+              'Content-Type': 'multipart/form-data',
+          }, 
+      });
+      if (response.status === 200) {
+          console.log('Form submitted successfully');
+          getProducts();
+          navigate("/userid/cart");
+      } else {
+          console.error('Form submission failed');
+      }
+  };
+
   return (
     <div className="row product-details mt-5 mb-5" >
-        <div className="col-5">
-            <img src={productData.image.url} className="card-img-top" alt="Product Image" style={{ height: '18rem' }} />
+        <div className="col-5 p-5">
+            <img src={productData.image} className="card-img-top" alt="Product Image" style={{ width:'80%' }} />
         </div>
         <div className="col-5">
           <div className="title mb-4"  id="page-title">
@@ -61,8 +80,10 @@ export default function ProductDetails() {
           <Form action={`/products/${id}/edit`}>
             <button className="btn btn-danger product-link">Edit</button>
           </Form>
-          
-          <button onClick={()=>{}} className="button btn btn-dark product-link">Add to Cart</button>
+          <br/>
+          <Form onSubmit={handleSubmit}>
+            <button className="button btn btn-dark product-link">Add to Cart</button>
+          </Form>  
         </div>
     </div>
   );

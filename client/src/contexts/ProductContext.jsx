@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect,useReducer} from "react";
 import axios from 'axios'
 import reducer from '../reducer/productReducer.js'
-import Products from "../pages/Products.jsx";
-import CreateProductForm from "../pages/CreateProductForm.jsx";
 
 const ProductContext=createContext();
 
@@ -15,25 +13,25 @@ const initialState={
 
 const ProductProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
-  
+    const getProducts = async () => {
+      dispatch({ type: "SET_LOADING" });
+      try {
+        const response = await axios.get('http://localhost:5000/api/products');
+        const allProducts = await response.data;
+        console.log(allProducts);
+        dispatch({ type: "SET_API_DATA", payload: allProducts });
+      } catch (error) {
+        dispatch({ type: "API_ERROR",payload:error });
+      }
+    };
+
+    
     useEffect(() => {
-      const getProducts = async () => {
-        dispatch({ type: "SET_LOADING" });
-        try {
-          const response = await axios.get('http://localhost:5000/api/products');
-          const allProducts = await response.data;
-          console.log(allProducts);
-          dispatch({ type: "SET_API_DATA", payload: allProducts });
-        } catch (error) {
-          dispatch({ type: "API_ERROR",payload:error });
-        }
-      };
-  
       getProducts();
-    }, [Products,CreateProductForm]); 
+    }, [dispatch]); 
   
     return (
-      <ProductContext.Provider value={{ ...state }}>
+      <ProductContext.Provider value={{ ...state, getProducts }}>
         {children}
       </ProductContext.Provider>
     );

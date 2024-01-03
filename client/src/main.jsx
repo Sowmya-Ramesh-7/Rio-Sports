@@ -11,6 +11,7 @@ import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements, u
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
+import Cart from './pages/Cart.jsx'
 
 
 
@@ -50,9 +51,9 @@ const router=createBrowserRouter(
         <Route 
         path="new" 
         element={<CreateProductForm />}
-        
         />
       </Route>
+      <Route path="userid/cart"  element={<Cart />}/>
       <Route path="app" element={<App />}/>
       <Route path="*" element={<PageNotFound />} errorElement/>
     </Route>
@@ -60,7 +61,6 @@ const router=createBrowserRouter(
 )
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>,

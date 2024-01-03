@@ -10,9 +10,11 @@ import uuid
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+from flask import session
 
 from dotenv import load_dotenv
 load_dotenv()
+
 
 app = Flask(__name__)
 CORS(app,origins='http://localhost:5173')
@@ -21,9 +23,17 @@ CORS(app,origins='http://localhost:5173')
 client = MongoClient("mongodb://localhost:27017/")
 db = client["RioFashion"]
 
+from functools import wraps
 
 
-
+def is_logged_in(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if 'user' in session:
+            return func(*args, **kwargs)
+        else:
+            return make_response("Unauthorized"), 401
+    return decorated_function
 
 class Products():
     def __init__(self,name,description,image,price,category,discount,gender):
@@ -94,6 +104,7 @@ class ProductNotFoundError(BaseException):
 
 
 @app.route("/api/products",methods=["POST"])
+@is_logged_in
 def create_product():
     newproduct=request.form
     

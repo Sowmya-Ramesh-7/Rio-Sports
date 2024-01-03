@@ -1,7 +1,24 @@
 import './NavBar.css'
-import { NavLink , Link} from 'react-router-dom'
+import { NavLink , Link,useNavigate} from 'react-router-dom'
+import {toast} from 'react-toastify';
+import { useUser } from '../../contexts/UserContext.jsx';
 
 export default function NavBar(){
+    const {user,setUser}= useUser();
+    console.log(user)
+    const logout=async()=>{
+        try{
+            const response=await toast.promise(axios.get("http://localhost:8080/api/logout"),
+            {
+                "success":"Logout Successful !!",
+                "error":"Logout Unsuccessful,Try Again !!"
+            });
+            setUser(null)
+            navigate("/")
+        } catch(e){
+            toast.error("Logout Unsuccessful !!")
+        }
+    }
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
@@ -68,6 +85,36 @@ export default function NavBar(){
                     </NavLink>
                     </li>
                 </ul>
+                </div>
+                <div className='right'>
+                {(!user)?
+                <NavLink style={{display:"flex"}} className={({isActive})=>
+                            [
+                                isActive? "active":"",
+                                "nav-link"
+                            ].join(" ")
+                        }
+                      to="/login">
+                        <p>Login/Signup&nbsp;</p> <i className="fa-solid fa-circle-user" style={{ fontSize:"1.5rem"}}></i> 
+                </NavLink>:
+                <NavLink style={{display:"flex"}} className={({isActive})=>
+                            [
+                                isActive? "active":"",
+                                "nav-link"
+                            ].join(" ")
+                        }
+                    onClick={{logout}}>
+                        <p>Logout&nbsp;</p> <i className="fa-solid fa-circle-user" style={{ fontSize:"1.5rem"}}></i> 
+                </NavLink>}
+                <NavLink className={({isActive})=>
+                        [
+                            isActive? "active":"",
+                            "nav-link"
+                        ].join(" ")
+                    }
+                    to="userid/cart">
+                    <i className="fa-solid fa-cart-shopping" style={{ fontSize:"1.5rem"}}></i> 
+                </NavLink>
                 </div>
             </div> 
         </nav>

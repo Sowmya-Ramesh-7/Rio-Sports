@@ -2,10 +2,12 @@ import {Form, useNavigate, useParams} from 'react-router-dom'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Loading from '../components/Loading';
+import { useProduct } from '../contexts/ProductContext';
 
 export default function CreateProductForm(){
     let { id } = useParams();
     const navigate = useNavigate();
+    const {getProducts}= useProduct();
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -68,10 +70,13 @@ export default function CreateProductForm(){
             console.log('Form submitted successfully');
 
             console.log(response.data);
+            getProducts();
             navigate("/products");
         } else {
             console.error('Form submission failed');
         }
+
+        
     };
   
   
@@ -95,7 +100,7 @@ export default function CreateProductForm(){
 
                     <div className="mb-4">
                         <p>Previous Image Preview</p>
-                        <img src={formData.previousImage} className="card" alt="Original Image" />
+                        <img src={formData.previousImage} style={{width:'18rem'}} className="card" alt="Original Image" />
                     </div>
 
                     <div className="mb-4">
@@ -118,7 +123,7 @@ export default function CreateProductForm(){
                     <div className="mb-4">
                         <label htmlFor="gender" className="form-label">Gender</label>
                         <select id="gender" name="gender" className="form-select" onChange={handleChange} required >
-                            <option value="">-- Select the Category --</option>
+                            <option value="">-- Select the gender --</option>
                             <option value="Male" selected={formData.gender === "Male"}>Male</option>
                             <option value="Female" selected={formData.gender === "Female"}>Female</option>
                             <option value="Kids" selected={formData.gender === "Kids"}>Kids</option>
